@@ -45,10 +45,30 @@ export default function Home() {
 
     document.documentElement.classList.add("lenis", "lenis-smooth");
 
+    // Force ScrollTrigger to refresh once all elements/fonts/scripts are loaded
+    const handleLoad = () => {
+      ScrollTrigger.refresh();
+    };
+
+    if (document.readyState === "complete") {
+      ScrollTrigger.refresh();
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    // Since HeroSection, ProcessSection, and FinalCTA are loaded dynamically on the client,
+    // they mount asynchronously. We schedule a refresh after a small delay to make sure
+    // they are fully hydrated, sized, and their DOM nodes are stable.
+    const refreshTimeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 600);
+
     return () => {
       gsap.ticker.remove(updateTicker);
       lenis.destroy();
       document.documentElement.classList.remove("lenis", "lenis-smooth");
+      window.removeEventListener("load", handleLoad);
+      clearTimeout(refreshTimeout);
     };
   }, []);
 
