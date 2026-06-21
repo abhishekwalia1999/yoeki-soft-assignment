@@ -300,7 +300,7 @@ export default function HeroSection() {
         <h1
           ref={headlineRef}
           className="font-serif font-light leading-[1.05] tracking-[-0.01em] text-white mb-9 select-none"
-          style={{ fontSize: "clamp(46px, 5vw, 80px)" }}
+          style={{ fontSize: "clamp(36px, 5vw, 80px)" }}
         >
           <span className="hero-line block">Engineering</span>
           <span className="hero-line block whitespace-nowrap">Digital Transformation</span>
@@ -324,7 +324,7 @@ export default function HeroSection() {
         </p>
 
         {/* CTA buttons */}
-        <div ref={ctaRef} className="flex items-center gap-7 pointer-events-auto">
+        <div ref={ctaRef} className="flex items-center gap-4 flex-wrap pointer-events-auto">
           {/* Primary filled pill */}
           <a
             href="#solutions"
@@ -749,7 +749,7 @@ export default function HeroSection() {
 
         @media (max-width: 640px) {
           .hero-text-col h1 {
-            font-size: clamp(32px, 8vw, 52px) !important;
+            font-size: clamp(28px, 8vw, 52px) !important;
           }
           .hero-scroll-indicator,
           .hero-trust-card {
