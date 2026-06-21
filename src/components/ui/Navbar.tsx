@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -13,10 +13,44 @@ const navLinks = [
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const lastScrollY = useRef(0);
+  const hasScrolled = useRef(false); // don't hide until user has scrolled past threshold
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      const delta = currentY - lastScrollY.current;
+
+      // Background blur triggers at 20px
+      setScrolled(currentY > 20);
+
+      // Only start tracking hide/show after scrolling past 80px
+      if (currentY > 80) {
+        hasScrolled.current = true;
+      }
+
+      if (hasScrolled.current) {
+        if (delta > 6) {
+          // Scrolling DOWN â€” hide navbar
+          setHidden(true);
+          setMenuOpen(false); // close mobile menu when hiding
+        } else if (delta < -4) {
+          // Scrolling UP â€” reveal navbar
+          setHidden(false);
+        }
+      }
+
+      // At the very top â€” always show
+      if (currentY <= 10) {
+        setHidden(false);
+        hasScrolled.current = false;
+      }
+
+      lastScrollY.current = currentY;
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -24,19 +58,25 @@ export default function Navbar() {
   return (
     <motion.nav
       initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.9, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${scrolled
+      animate={{
+        y: hidden ? "-100%" : 0,
+        opacity: hidden ? 0 : 1,
+      }}
+      transition={{
+        duration: 0.45,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className={`fixed top-0 left-0 right-0 z-50 ${scrolled
         ? "bg-[#000000]/90 backdrop-blur-2xl border-b border-white/[0.06]"
         : "bg-transparent"
         }`}
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* Nav inner — matches hero content width */}
+      {/* Nav inner â€” matches hero content width */}
       <div className="w-full flex items-center justify-between" style={{ paddingTop: "12px", paddingBottom: "12px", paddingLeft: "clamp(16px, 5.5vw, 80px)", paddingRight: "clamp(16px, 5.5vw, 80px)" }}>
 
-        {/* ── Logo ── */}
+        {/* â”€â”€ Logo â”€â”€ */}
         <a
           href="#"
           className="flex items-center gap-[10px] shrink-0"
@@ -53,7 +93,7 @@ export default function Navbar() {
           />
         </a>
 
-        {/* ── Center nav links ── */}
+        {/* â”€â”€ Center nav links â”€â”€ */}
         <div
           className="hidden md:flex items-center gap-8 lg:gap-10 absolute left-1/2 -translate-x-1/2"
           role="menubar"
@@ -70,7 +110,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* ── Right CTA ── */}
+        {/* â”€â”€ Right CTA â”€â”€ */}
         <div className="hidden md:flex items-center shrink-0">
 
           <a
@@ -108,7 +148,7 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* ── Mobile toggle ── */}
+        {/* â”€â”€ Mobile toggle â”€â”€ */}
         <button
           id="mobile-menu-toggle"
           className="md:hidden p-2 text-white transition-colors"
@@ -124,7 +164,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* ── Mobile menu ── */}
+      {/* â”€â”€ Mobile menu â”€â”€ */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -169,3 +209,4 @@ export default function Navbar() {
     </motion.nav>
   );
 }
+
