@@ -30,6 +30,7 @@ export default function HeroSection() {
   const logoFloatRef = useRef<HTMLDivElement>(null);
   const logoTiltRef = useRef<HTMLDivElement>(null);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
   const waterCanvasRef = useRef<HTMLCanvasElement>(null);
   const displacementRef = useRef<any>(null);
   const turbulenceRef = useRef<any>(null);
@@ -80,6 +81,10 @@ export default function HeroSection() {
   };
 
   useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.8;
+    }
+
     /* ── Initial hidden states ─────────────────────────────── */
     gsap.set(logoWrapRef.current, { opacity: 0, scale: 0.86, rotate: -2 });
     gsap.set(taglineRef.current, { opacity: 0, x: -24 });
@@ -229,12 +234,18 @@ export default function HeroSection() {
 
     animateWater();
 
+    // Refresh ScrollTrigger after mounting to let layout stabilize
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+
     return () => {
       tl.kill();
       floatTl.kill();
       window.removeEventListener("mousemove", onMouseMove);
       if (st) st.kill();
       cancelAnimationFrame(waterRafId);
+      clearTimeout(refreshTimer);
     };
   }, []);
 
@@ -430,11 +441,15 @@ export default function HeroSection() {
             }}
           >
             <video
-              src="/yoeki-logo-video.mp4"
+              ref={videoRef}
+              src="/yoeki-banner-object.webm"
               autoPlay
               loop
               muted
               playsInline
+              onPlay={(e) => {
+                e.currentTarget.playbackRate = 0.8;
+              }}
               style={{
                 position: "absolute",
                 top: 0,
