@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* â”€â”€â”€ Slide Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const slides = [
   {
     id: 0,
@@ -175,7 +174,15 @@ export default function ProcessSection() {
       });
     }, containerRef);
 
-    return () => ctx.revert();
+    // Refresh ScrollTrigger after a brief delay to ensure layout sizes are fully updated
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(refreshTimer);
+    };
   }, []);
 
   const handleIndicatorClick = (index: number) => {
@@ -511,7 +518,7 @@ export default function ProcessSection() {
           </a>
         </div>
 
-        {/* â•â• FLOATING TITLE OVERLAY (Z-axis center, overlaps both cols) â•â• */}
+        {/* FLOATING TITLE OVERLAY (Z-axis center, overlaps both cols)  */}
         <div
           className="proc-floating-title-wrap"
           style={{
