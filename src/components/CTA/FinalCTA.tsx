@@ -78,8 +78,14 @@ export default function FinalCTA() {
       },
     });
 
+    // Refresh ScrollTrigger after mounting to let layout stabilize
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+
     return () => {
       trigger.kill();
+      clearTimeout(refreshTimer);
     };
   }, []);
 
